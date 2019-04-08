@@ -19,7 +19,7 @@ class Embedding(nn.Module):
         self.pin_embedding.weight.data[self.pin_embedding.padding_idx].fill_(0)
     
     def forward(self):
-        _sos_token = torch.zeros((self.query_seq.size()[0], 1), dtype = torch.int64)
+        _sos_token = torch.zeros((self.query_seq.size()[0], 1), dtype = torch.int64).cuda()
         query_seq = self.query_seq
         target_seq = torch.cat((_sos_token, self.target_seq), 1)
         query_input = self.pin_embedding(query_seq)
