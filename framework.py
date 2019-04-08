@@ -11,6 +11,7 @@ import sys
 
 class Model(nn.Module):
     def __init__(self, config):
+        super(Model, self).__init__()
         self.config = config
         self.embedding = Embedding(config)
         self.seq2seq = Seq2seq(config)
@@ -65,7 +66,7 @@ class Train():
         self.train_data_loader = train_data_loader
         self.ckpt_dir = ckpt_dir
 
-    def init_train(self, model, loss):
+    def init_train(self, model):
         self.train_model = model
         self.train_model.cuda()
         self.train_model.train()
