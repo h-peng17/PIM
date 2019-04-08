@@ -98,6 +98,10 @@ class Seq2seq(nn.Module):
         '''
         # output = F.relu(input)
         input = input.permute(1, 0, 2)
+        if input.size() != [self.target_seq.size()[0], 1, self.config.embedding_size] or hidden.size() != [1, self.target_seq.size()[0], self.config.hidden_size]:
+            print(input.size())
+            print(hidden.size())
+            raise(Exception('Wrong'))
         output, hidden = self.rnn_decoder(input, hidden)
         return output, hidden
     
