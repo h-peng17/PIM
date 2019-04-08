@@ -82,7 +82,7 @@ class Train():
         self.train_model.embedding.query_seq = self.to_var(batch["query_seq"])
         self.train_model.embedding.target_seq = self.to_var(batch["target_seq"])
         self.train_model.seq2seq.target_seq = self.to_var(batch["target_seq"])
-        self.train_model.seq2seq.loss_mask = torch.form_numpy(batch["query_mask"]).to(torch.float32).cuda()
+        self.train_model.seq2seq.loss_mask = torch.from_numpy(batch["query_mask"]).to(torch.float32).cuda()
 
         self.optimizer.zero_grad()
         loss = self.train_model()
