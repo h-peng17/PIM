@@ -88,7 +88,7 @@ class Seq2seq(nn.Module):
         '''
             本函数为每一个时间步的decoder
             参数说明:
-            input: [batch_size, 1, embedding_size], 为当前时间步的输入
+            input: [1, B, embedding_size], 为当前时间步的输入
             hidden: [1, B, embedding_size], 为上一个时间步的隐状态(初始化为encoder的最后一个隐状态)
             在训练时，input为当前的预测的单词的前一个单词，第一个为<SOS>
             在测试时，input为上一个时间步的预测输出
@@ -97,8 +97,8 @@ class Seq2seq(nn.Module):
             hidden: [1, batch_size, hidden_size]
         '''
         # output = F.relu(input)
-        input = input.permute(1, 0, 2)
-        if input.size()[0] != self.target_seq.size()[0] or hidden.size()[1] != self.target_seq.size()[0]:
+        # input = input.permute(1, 0, 2)
+        if input.size()[1] != self.target_seq.size()[0] or hidden.size()[1] != self.target_seq.size()[0]:
             print(input.size())
             print(hidden.size())
             print(self.target_seq.size())
@@ -117,23 +117,23 @@ class Seq2seq(nn.Module):
         '''
         loss = 0
         _, encoder_hidden = self.encoder(query_input)
-        decoder_input = torch.unsqueeze(target_input[:,0,:], 1) # init an input of [batch_size, 1, embedding_size]
+        decoder_input = torch.unsqueeze(target_input[:,0,:], 0) # init an input of [batch_size, 1, embedding_size]
         decoder_hidden = encoder_hidden
         if is_training:
             for i in range(1, target_input.size()[1]):
                 decoder_output, decoder_hidden = self.decoder_step(decoder_input, decoder_hidden)
                 loss += self.softmax_cross_entropyloss(decoder_output, self.target_seq[:, i-1], self.loss_mask[:, i-1])
-                decoder_input = torch.unsqueeze(target_input[:, i, :], 1) 
+                decoder_input = torch.unsqueeze(target_input[:, i, :], 0) 
             return loss
-        else:
-            output = [] # list of [1, batch_size, hidden_size]
-            for i in range(1, target_input.size()[1]):
-                decoder_output, decoder_hidden = self.decoder_step(decoder_input, decoder_hidden)
-                decoder_input = decoder_output
-                output.append(decoder_output)
-            # [time_steps, batch_size, vacab_size] -> [batch_size, time_steps, vacab_size]
-            output = self.linear(torch.cat(output, 0)).permute(1, 0, 2)
-            return self.seq_output(output)
+        # else:
+        #     output = [] # list of [1, batch_size, hidden_size]
+        #     for i in range(1, target_input.size()[1]):
+        #         decoder_output, decoder_hidden = self.decoder_step(decoder_input, decoder_hidden)
+        #         decoder_input = decoder_output
+        #         output.append(decoder_output)
+        #     # [time_steps, batch_size, vacab_size] -> [batch_size, time_steps, vacab_size]
+        #     output = self.linear(torch.cat(output, 0)).permute(1, 0, 2)
+        #     return self.seq_output(output)
 
     
 
