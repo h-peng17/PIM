@@ -101,6 +101,7 @@ class Seq2seq(nn.Module):
         if input.size()[0] != self.target_seq.size()[0] or hidden.size()[1] != self.target_seq.size()[0]:
             print(input.size())
             print(hidden.size())
+            print(self.target_seq.size())
             raise(Exception('Wrong'))
         output, hidden = self.rnn_decoder(input, hidden)
         return output, hidden
