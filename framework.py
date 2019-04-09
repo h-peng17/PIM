@@ -101,8 +101,9 @@ class Train():
         for epoch in range(self.config.max_epoch):
             for i in range(int(len(train_order) / self.config.batch_size)):
                 loss = self.train_one_step()
-                sys.stdout.write('epoch:{}, batch:{}, loss:{}\r'.format(epoch, i, loss))
+                # sys.stdout.write('epoch:{}, batch:{}, loss:{}\r'.format(epoch, i, loss))
                 # sys.stdout.flush()
+                print('epoch:{}, batch:{}, loss:{}\r'.format(epoch, i, loss))
 
             if (epoch + 1) % self.config.save_epoch == 0:
                 print('epoch:{} has saved'.format(epoch))
