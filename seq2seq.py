@@ -35,7 +35,7 @@ class Seq2seq(nn.Module):
         self.hidden_size = config.hidden_size
         self.rnn_encoder = nn.GRU(input_size = self.input_size, hidden_size = self.hidden_size)
         self.rnn_decoder = nn.GRU(input_size = self.input_size, hidden_size = self.hidden_size)
-        self.linear = nn.Linear(config.hidden_size, config.vacab_size)
+        self.linear = nn.Linear(config.hidden_size, config.vacab_size + 3)
         self.loss = nn.CrossEntropyLoss(reduce = False)
         self._init_weight()
         self.config = config
