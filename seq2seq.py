@@ -48,7 +48,7 @@ class Seq2seq(nn.Module):
         # nn.init.xavier_normal_(self.rnn_encoder.weight)
         # nn.init.xavier_normal_(self.rnn_decoder.weight)
         nn.init.xavier_normal_(self.linear.weight)
-        nn.init.xavier_normal_(self.linear2.weight)
+        nn.init.xavier_normal_(self.embed2input.weight)
 
     def softmax_cross_entropyloss(self, logit, target_seq, mask):
         '''
