@@ -146,7 +146,7 @@ class Test():
             seq += '\r'
             out_file += seq
         print(out_file)
-        with open('../data/output.txt', 'w') as f:
+        with open('../data/output.txt', 'w', encoding = 'utf8') as f:
             f.write(out_file)
         print('done!')
 
