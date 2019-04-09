@@ -33,10 +33,10 @@ class Seq2seq(nn.Module):
         super(Seq2seq, self).__init__()
         self.input_size = config.embedding_size
         self.hidden_size = config.hidden_size
-        self.rnn_encoder = nn.GRU(input_size = self.input_size, hidden_size = self.hidden_size)
-        self.rnn_decoder = nn.GRU(input_size = self.input_size, hidden_size = self.hidden_size)
+        self.rnn_encoder = nn.GRU(input_size = self.hidden_size, hidden_size = self.hidden_size)
+        self.rnn_decoder = nn.GRU(input_size = self.hidden_size, hidden_size = self.hidden_size)
         self.linear = nn.Linear(config.hidden_size, config.vacab_size + 3)
-        self.linear2 = nn.Linear(config.hidden_size, config.embedding_size)
+        self.embed2input = nn.Linear(config.embedding_size, config.hidden_size)
         self.loss = nn.CrossEntropyLoss(reduce = False)
         self._init_weight()
         self.config = config
@@ -76,7 +76,7 @@ class Seq2seq(nn.Module):
         '''
             本函数为seq2seq的编码部分
             参数说明:
-            input [batch_size, time_steps, embedding_size]
+            input [batch_size, time_steps, hidden_size]
             函数返回:
             output [time_steps, batch_size, hidden_size], 每个时间步的输出
             hidden [1, batch_size, hidden_size], 为最终的隐状态
@@ -91,8 +91,8 @@ class Seq2seq(nn.Module):
         '''
             本函数为每一个时间步的decoder
             参数说明:
-            input: [1, B, embedding_size], 为当前时间步的输入
-            hidden: [1, B, embedding_size], 为上一个时间步的隐状态(初始化为encoder的最后一个隐状态)
+            input: [1, B, hidden_size], 为当前时间步的输入
+            hidden: [1, B, hidden_size], 为上一个时间步的隐状态(初始化为encoder的最后一个隐状态)
             在训练时，input为当前的预测的单词的前一个单词，第一个为<SOS>
             在测试时，input为上一个时间步的预测输出
             函数返回值:
@@ -101,11 +101,6 @@ class Seq2seq(nn.Module):
         '''
         # output = F.relu(input)
         # input = input.permute(1, 0, 2)
-        if input.size()[1] != self.target_seq.size()[0] or hidden.size()[1] != self.target_seq.size()[0]:
-            print(input.size())
-            print(hidden.size())
-            print(self.target_seq.size())
-            raise(Exception('Wrong'))
         output, hidden = self.rnn_decoder(input, hidden)
         return output, hidden
     
@@ -118,11 +113,12 @@ class Seq2seq(nn.Module):
             函数返回:
             loss: 平均到每个instance的loss
         '''
+        # 首先做一下映射
+        query_input = self.embed2input(query_input)
+        target_input = self.embed2input(target_input)
         loss = 0
-        print(query_input)
-        print(target_input)
         _, encoder_hidden = self.encoder(query_input)
-        decoder_input = torch.unsqueeze(target_input[:,0,:], 0) # init an input of [batch_size, 1, embedding_size]
+        decoder_input = torch.unsqueeze(target_input[:,0,:], 0) # init an input of [1, batch_size, hidden_size]
         decoder_hidden = encoder_hidden
         if is_training:
             for i in range(1, target_input.size()[1]):
@@ -134,7 +130,7 @@ class Seq2seq(nn.Module):
             output = [] # list of [1, batch_size, hidden_size]
             for i in range(1, target_input.size()[1]):
                 decoder_output, decoder_hidden = self.decoder_step(decoder_input, decoder_hidden)
-                decoder_input = self.linear2(decoder_output)
+                decoder_input = decoder_output
                 output.append(decoder_output)
             # [time_steps, batch_size, vacab_size] -> [batch_size, time_steps, vacab_size]
             output = self.linear(torch.cat(output, 0)).permute(1, 0, 2)
