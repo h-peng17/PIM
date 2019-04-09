@@ -16,6 +16,7 @@ config = Config()
 test = Test(config, '../ckpt', id2word)
 test.init_test(Model(config))
 
+print('请输入:')
 line = ''
 while line != 'stop':
     line = input()
