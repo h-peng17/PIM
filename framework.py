@@ -149,7 +149,7 @@ class Test():
         print(out_file)
         with open('../data/output.txt', 'w', encoding = 'utf8') as f:
             f.write(out_file)
-        print('done!')
+        # print('done!')
 
     def test_one_step(self, query_seq, target_seq_len):
         self.test_model.embedding.query_seq = self.to_val(query_seq)
