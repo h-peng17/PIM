@@ -23,7 +23,7 @@ class Data_loader():
     def next_batch(self):
         if self.idx >= self.instance_total:
             self.idx = 0
-            # random.shuffle(self.order)
+            random.shuffle(self.order)
         id0 = self.idx 
         id1 = self.idx + self.config.batch_size
         self.idx = id1 
