@@ -31,12 +31,12 @@ class Config():
         self.vacab_size = 6763
         self.pin_size = 406
         self.batch_size = 300
-        self.lr = 0.5 
+        self.lr = 0.001 
         self.max_epoch = 100
         self.embedding_size = 50
         self.seq_len = 20
-        self.hidden_size = 230
-        self.weight_decay = 0
+        self.hidden_size = 512
+        self.weight_decay = 1e-5
         self.save_epoch = 2
         self.model_name = 'seq2seq'
         self.loss_save = 100
@@ -73,7 +73,7 @@ class Train():
         self.train_model.train()
     
         parameters_to_optimize = filter(lambda x: x.requires_grad, self.train_model.parameters())
-        self.optimizer = optim.SGD(parameters_to_optimize, lr = self.config.lr, weight_decay = self.config.weight_decay)
+        self.optimizer = optim.Adam(parameters_to_optimize, lr = self.config.lr, weight_decay = self.config.weight_decay)
 
     def to_var(self, x):
         return torch.from_numpy(x).to(torch.int64).cuda()
