@@ -27,7 +27,6 @@ class Embedding(nn.Module):
 
         return query_input, target_input
 
-
 class Seq2seq(nn.Module):
     def __init__(self, config):
         super(Seq2seq, self).__init__()
@@ -136,5 +135,6 @@ class Seq2seq(nn.Module):
             output = self.linear(torch.cat(output, 0)).permute(1, 0, 2)
             return self.seq_output(output)
 
-    
+
+
 
