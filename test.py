@@ -36,6 +36,7 @@ while line != 'stop':
     for i, pin in enumerate(pins):
         if pin not in p2id:
             is_continue = True
+            print('Invalid input!')
             break
         query[0][i] = p2id[pin]
     if is_continue:
