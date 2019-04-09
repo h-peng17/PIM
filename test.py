@@ -26,8 +26,8 @@ while line != 'stop':
     target_seq_len[0] = len(pins)
     for i, pin in enumerate(pins):
         query[0][i] = p2id[pin]
-    print(query)
-    print(target_seq_len)
+    # print(query)
+    # print(target_seq_len)
     test.test_one_step(query, target_seq_len)
 
     
