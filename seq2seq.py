@@ -36,16 +36,19 @@ class Seq2seq(nn.Module):
         self.rnn_encoder = nn.GRU(input_size = self.input_size, hidden_size = self.hidden_size)
         self.rnn_decoder = nn.GRU(input_size = self.input_size, hidden_size = self.hidden_size)
         self.linear = nn.Linear(config.hidden_size, config.vacab_size + 3)
+        self.linear2 = nn.Linear(config.hidden_size, config.embedding_size)
         self.loss = nn.CrossEntropyLoss(reduce = False)
         self._init_weight()
         self.config = config
         self.target_seq = None  # [batch_size, time_steps]
         self.loss_mask = None # [batch_size, time_steps]
+        
 
     def _init_weight(self):
         # nn.init.xavier_normal_(self.rnn_encoder.weight)
         # nn.init.xavier_normal_(self.rnn_decoder.weight)
         nn.init.xavier_normal_(self.linear.weight)
+        nn.init.xavier_normal_(self.linear2.weight)
 
     def softmax_cross_entropyloss(self, logit, target_seq, mask):
         '''
@@ -116,6 +119,8 @@ class Seq2seq(nn.Module):
             loss: 平均到每个instance的loss
         '''
         loss = 0
+        print(query_input)
+        print(target_input)
         _, encoder_hidden = self.encoder(query_input)
         decoder_input = torch.unsqueeze(target_input[:,0,:], 0) # init an input of [batch_size, 1, embedding_size]
         decoder_hidden = encoder_hidden
@@ -129,7 +134,7 @@ class Seq2seq(nn.Module):
             output = [] # list of [1, batch_size, hidden_size]
             for i in range(1, target_input.size()[1]):
                 decoder_output, decoder_hidden = self.decoder_step(decoder_input, decoder_hidden)
-                decoder_input = decoder_output
+                decoder_input = self.linear2(decoder_output)
                 output.append(decoder_output)
             # [time_steps, batch_size, vacab_size] -> [batch_size, time_steps, vacab_size]
             output = self.linear(torch.cat(output, 0)).permute(1, 0, 2)
