@@ -125,7 +125,7 @@ class Test():
         self.test_model = model
         self.test_model.cuda()
         self.test_model.eval()
-        path = os.path.join(self.ckpt_dir, self.config.model_name + '-' + str(5))
+        path = os.path.join(self.ckpt_dir, self.config.model_name + '-' + str(1))
         self.test_model.load_state_dict(torch.load(path))
     
     def to_val(self, x):
