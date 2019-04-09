@@ -5,7 +5,7 @@ from framework import Config
 import json 
 import numpy as np 
 import os 
-os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+os.environ["CUDA_VISIBLE_DEVICES"] = '7'
 p2id = json.load(open("../data/p2id.json"))
 word2id = json.load(open('../data/word2id.json'))
 id2word = {}
