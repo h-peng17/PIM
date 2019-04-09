@@ -39,6 +39,7 @@ class Config():
         self.weight_decay = 0
         self.save_epoch = 2
         self.model_name = 'seq2seq'
+        self.loss_save = 10
 
     
     def set_batch_size(self, batch_size):
@@ -95,18 +96,21 @@ class Train():
         print("begin training...")
         if not os.path.exists(self.ckpt_dir):
             os.mkdir(self.ckpt_dir)
-        
+        Loss = []
         train_order = self.train_data_loader.order 
         for epoch in range(self.config.max_epoch):
             for i in range(int(len(train_order) / self.config.batch_size)):
                 loss = self.train_one_step()
                 sys.stdout.write('epoch:{}, batch:{}, loss:{}\r'.format(epoch, i, loss))
-                sys.stdout.flush()
+                # sys.stdout.flush()
 
             if (epoch + 1) % self.config.save_epoch == 0:
                 print('epoch:{} has saved'.format(epoch))
                 path = os.path.join(self.ckpt_dir, self.config.model_name + '-' + str(epoch))
                 torch.save(self.train_model.state_dict(), path)
+            
+            if (epoch + 1 ) % self.config.loss_save == 0:
+                Loss.append(np.array((loss.cpu()).detach))
                 
 class Test():
     def __init__(self, test_data_loader, config, ckpt_dir, id2word):
