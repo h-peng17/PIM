@@ -125,15 +125,15 @@ class Seq2seq(nn.Module):
                 loss += self.softmax_cross_entropyloss(decoder_output, self.target_seq[:, i-1], self.loss_mask[:, i-1])
                 decoder_input = torch.unsqueeze(target_input[:, i, :], 0) 
             return loss
-        # else:
-        #     output = [] # list of [1, batch_size, hidden_size]
-        #     for i in range(1, target_input.size()[1]):
-        #         decoder_output, decoder_hidden = self.decoder_step(decoder_input, decoder_hidden)
-        #         decoder_input = decoder_output
-        #         output.append(decoder_output)
-        #     # [time_steps, batch_size, vacab_size] -> [batch_size, time_steps, vacab_size]
-        #     output = self.linear(torch.cat(output, 0)).permute(1, 0, 2)
-        #     return self.seq_output(output)
+        else:
+            output = [] # list of [1, batch_size, hidden_size]
+            for i in range(1, target_input.size()[1]):
+                decoder_output, decoder_hidden = self.decoder_step(decoder_input, decoder_hidden)
+                decoder_input = decoder_output
+                output.append(decoder_output)
+            # [time_steps, batch_size, vacab_size] -> [batch_size, time_steps, vacab_size]
+            output = self.linear(torch.cat(output, 0)).permute(1, 0, 2)
+            return self.seq_output(output)
 
     
 
