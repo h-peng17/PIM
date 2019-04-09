@@ -104,13 +104,14 @@ class Train():
                 sys.stdout.write('epoch:{}, batch:{}, loss:{}\r'.format(epoch, i, loss))
                 sys.stdout.flush()
 
+                if (i + 1) % self.config.loss_save == 0:
+                    Loss.append(np.array((loss.cpu()).detach))
+
             if (epoch + 1) % self.config.save_epoch == 0:
                 print('epoch:{} has saved'.format(epoch))
                 path = os.path.join(self.ckpt_dir, self.config.model_name + '-' + str(epoch))
                 torch.save(self.train_model.state_dict(), path)
             
-            if (epoch + 1 ) % self.config.loss_save == 0:
-                Loss.append(np.array((loss.cpu()).detach))
         np.save('../data/loss.npy', np.array(Loss))
                 
 class Test():
