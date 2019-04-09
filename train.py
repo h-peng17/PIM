@@ -4,7 +4,7 @@ from framework import Model
 from framework import Config
 from data_loader import Data_loader
 import os 
-os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+os.environ["CUDA_VISIBLE_DEVICES"] = '6'
 
 config = Config()
 train_data_loader = Data_loader('train', config)
