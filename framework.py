@@ -39,7 +39,7 @@ class Config():
         self.weight_decay = 0
         self.save_epoch = 2
         self.model_name = 'seq2seq'
-        self.loss_save = 10
+        self.loss_save = 100
 
     
     def set_batch_size(self, batch_size):
