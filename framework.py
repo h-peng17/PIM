@@ -30,9 +30,9 @@ class Config():
     def __init__(self):
         self.vacab_size = 6763
         self.pin_size = 406
-        self.batch_size = 160
+        self.batch_size = 300
         self.lr = 0.5 
-        self.max_epoch = 60
+        self.max_epoch = 6
         self.embedding_size = 50
         self.seq_len = 20
         self.hidden_size = 230
@@ -101,9 +101,8 @@ class Train():
         for epoch in range(self.config.max_epoch):
             for i in range(int(len(train_order) / self.config.batch_size)):
                 loss = self.train_one_step()
-                # sys.stdout.write('epoch:{}, batch:{}, loss:{}\r'.format(epoch, i, loss))
-                # sys.stdout.flush()
-                print('epoch:{}, batch:{}, loss:{}\r'.format(epoch, i, loss))
+                sys.stdout.write('epoch:{}, batch:{}, loss:{}\r'.format(epoch, i, loss))
+                sys.stdout.flush()
 
             if (epoch + 1) % self.config.save_epoch == 0:
                 print('epoch:{} has saved'.format(epoch))
@@ -112,6 +111,7 @@ class Train():
             
             if (epoch + 1 ) % self.config.loss_save == 0:
                 Loss.append(np.array((loss.cpu()).detach))
+        np.save('../data/loss.npy', np.array(Loss))
                 
 class Test():
     def __init__(self, test_data_loader, config, ckpt_dir, id2word):
