@@ -120,12 +120,12 @@ class Test():
         self.ckpt_dir = ckpt_dir
         self.id2word = id2word
 
-    def init_test(self, model):
+    def init_test(self, model, ckpt_index):
         print('init test model....')
         self.test_model = model
         self.test_model.cuda()
         self.test_model.eval()
-        path = os.path.join(self.ckpt_dir, self.config.model_name + '-' + str(1))
+        path = os.path.join(self.ckpt_dir, self.config.model_name + '-' + ckpt_index)
         self.test_model.load_state_dict(torch.load(path))
     
     def to_val(self, x):
