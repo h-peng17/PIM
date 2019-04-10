@@ -120,8 +120,8 @@ class Seq2seq(nn.Module):
         target_input = self.embed2input(target_input)
         loss = 0
         encoder_output, encoder_hidden = self.encoder(query_input)
-        self.dropout(encoder_output)
-        self.dropout(encoder_hidden)
+        # self.dropout(encoder_output)
+        # self.dropout(encoder_hidden)
         encoder_output = encoder_output.permute(1, 0, 2) # [batch, time_step, hidden_size]
         decoder_input = torch.unsqueeze(target_input[:,0,:], 0) # init an input of [1, batch_size, hidden_size]
         decoder_hidden = encoder_hidden
