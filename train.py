@@ -4,8 +4,14 @@ from framework import Model
 from framework import Config
 from data_loader import Data_loader
 import os 
-os.environ["CUDA_VISIBLE_DEVICES"] = '6'
+from optparse import OptionParser
 
+parser = OptionParser()
+parser.add_option('--gpu',dest='gpu',default = 7,help = 'gpu')
+parser.add_option('--ckpt_index',dest='ckpt_index',default = 1, help = 'ckpt index')
+(options, args) =parser.parse_args()
+
+os.environ["CUDA_VISIBLE_DEVICES"] = options.gpu
 config = Config()
 train_data_loader = Data_loader('train', config)
 train = Train(train_data_loader, config, '../ckpt_1')
