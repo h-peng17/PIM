@@ -39,7 +39,7 @@ class Seq2seq(nn.Module):
         self.loss = nn.CrossEntropyLoss(reduce = False)
         self._init_weight()
         self.config = config
-        self.dropout = nn.Dropout(0.3)
+        self.dropout = nn.Dropout(0.5)
         self.target_seq = None  # [batch_size, time_steps]
         self.loss_mask = None # [batch_size, time_steps]
         
