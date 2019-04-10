@@ -21,7 +21,7 @@ for key in word2id:
     id2word[word2id[key]] = key
 
 config = Config()
-test = Test(config, '../ckpt', id2word)
+test = Test(config, '../ckpt_1', id2word)
 test.init_test(Model(config), options.ckpt_index)
 
 print('请输入:')
