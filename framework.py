@@ -36,7 +36,7 @@ class Config():
         self.embedding_size = 50
         self.seq_len = 20
         self.hidden_size = 512
-        self.weight_decay = 1e-5
+        self.weight_decay = 1e-6
         self.save_epoch = 1
         self.model_name = 'seq2seq'
         self.loss_save = 1000
