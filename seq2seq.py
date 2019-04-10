@@ -141,7 +141,8 @@ class Seq2seq(nn.Module):
 
             # [time_steps, batch_size, vacab_size] -> [batch_size, time_steps, vacab_size]
             output = self.linear(torch.cat(output, 0)).permute(1, 0, 2)
-            return loss, self.seq_output(output) * (self.loss_mask.to(torch.float32)) # [batch_size, time_steps]
+            loss_mask = self.loss_mask.to(torch.float32)
+            return loss, self.seq_output(output) * loss_mask # [batch_size, time_steps]
         else:
             output = [] # list of [1, batch_size, hidden_size * 2]
             for i in range(1, target_input.size()[1]):
