@@ -30,16 +30,16 @@ class Config():
     def __init__(self):
         self.vacab_size = 6763
         self.pin_size = 406
-        self.batch_size = 300
+        self.batch_size = 1000 
         self.lr = 0.001 
         self.max_epoch = 100
         self.embedding_size = 50
         self.seq_len = 20
         self.hidden_size = 512
         self.weight_decay = 1e-5
-        self.save_epoch = 2
+        self.save_epoch = 1
         self.model_name = 'seq2seq'
-        self.loss_save = 100
+        self.loss_save = 1000
 
     
     def set_batch_size(self, batch_size):
