@@ -95,7 +95,7 @@ class Train():
 
         output = np.array(((output.cpu()).detach()))
         output = np.multiply(output, batch["query_mask"])
-        correct = (output == target_seq).sum()
+        correct = np.logical_and(output == target_seq, output != 0).sum()
         accuracy = correct / all_leng
 
         return loss, accuracy 
