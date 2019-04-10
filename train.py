@@ -8,6 +8,6 @@ os.environ["CUDA_VISIBLE_DEVICES"] = '6'
 
 config = Config()
 train_data_loader = Data_loader('train', config)
-train = Train(train_data_loader, config, '../ckpt')
+train = Train(train_data_loader, config, '../ckpt_1')
 train.init_train(Model(config))
 train._train()
