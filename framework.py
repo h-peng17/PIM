@@ -18,8 +18,8 @@ class Model(nn.Module):
 
     def forward(self):
         query_input, target_input = self.embedding()
-        loss = self.seq2seq(query_input, target_input, True)
-        return loss 
+        loss, output = self.seq2seq(query_input, target_input, True)
+        return loss, output 
     
     def test(self):
         query_input, target_input = self.embedding()
@@ -30,13 +30,13 @@ class Config():
     def __init__(self):
         self.vacab_size = 6763
         self.pin_size = 406
-        self.batch_size = 300
+        self.batch_size = 128
         self.lr = 0.001 
-        self.max_epoch = 100
-        self.embedding_size = 50
+        self.max_epoch = 1000
+        self.embedding_size = 300
         self.seq_len = 20
-        self.hidden_size = 512
-        self.weight_decay = 1e-6
+        self.hidden_size = 1024
+        self.weight_decay = 1e-5
         self.save_epoch = 1
         self.model_name = 'seq2seq'
         self.loss_save = 1000
@@ -85,27 +85,31 @@ class Train():
         self.train_model.seq2seq.target_seq = self.to_var(batch["target_seq"])
         self.train_model.seq2seq.loss_mask = torch.from_numpy(batch["query_mask"]).to(torch.float32).cuda()
 
+        target_seq = np.multiply(batch["target_seq"], batch["query_mask"]) #[batch, time_steps]
+        all_leng = np.sum(batch["target_seq_len"]) # total
+
         self.optimizer.zero_grad()
-        loss = self.train_model()
+        loss, output = self.train_model()
         loss.backward()
         self.optimizer.step()
 
-        return loss 
+        output = np.array(((output.cpu()).detach()))
+        correct = (output == target_seq).sum()
+        accuracy = correct / all_leng
+
+        return loss, accuracy 
     
     def _train(self):
         print("begin training...")
         if not os.path.exists(self.ckpt_dir):
             os.mkdir(self.ckpt_dir)
-        Loss = []
         train_order = self.train_data_loader.order 
         for epoch in range(self.config.max_epoch):
             for i in range(int(len(train_order) / self.config.batch_size)):
-                loss = self.train_one_step()
-                sys.stdout.write('epoch:{}, batch:{}, loss:{}\r'.format(epoch, i, loss))
+                loss, accuracy = self.train_one_step()
+                sys.stdout.write('epoch:{}, batch:{}, loss:{}, accuracy:{}\r'.format(epoch, i, loss, round(accuracy, 6)))
                 sys.stdout.flush()
 
-                if (i + 1) % self.config.loss_save == 0:
-                    Loss.append(np.array((loss.cpu()).detach))
 
             if (epoch + 1) % self.config.save_epoch == 0:
                 print('epoch:{} has saved'.format(epoch))
