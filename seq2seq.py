@@ -39,7 +39,7 @@ class Seq2seq(nn.Module):
         self.loss = nn.CrossEntropyLoss(reduce = False)
         self._init_weight()
         self.config = config
-        self.dropout = nn.Dropout(0.5)
+        self.dropout = nn.Dropout(0.3)
         self.target_seq = None  # [batch_size, time_steps]
         self.loss_mask = None # [batch_size, time_steps]
         
@@ -120,6 +120,8 @@ class Seq2seq(nn.Module):
         target_input = self.embed2input(target_input)
         loss = 0
         encoder_output, encoder_hidden = self.encoder(query_input)
+        self.dropout(encoder_output)
+        self.dropout(encoder_hidden)
         encoder_output = encoder_output.permute(1, 0, 2) # [batch, time_step, hidden_size]
         decoder_input = torch.unsqueeze(target_input[:,0,:], 0) # init an input of [1, batch_size, hidden_size]
         decoder_hidden = encoder_hidden
