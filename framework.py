@@ -94,6 +94,7 @@ class Train():
         self.optimizer.step()
 
         output = np.array(((output.cpu()).detach()))
+        output = np.multiply(output, batch["query_mask"])
         correct = (output == target_seq).sum()
         accuracy = correct / all_leng
 
