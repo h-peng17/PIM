@@ -126,17 +126,22 @@ class Seq2seq(nn.Module):
         decoder_input = torch.unsqueeze(target_input[:,0,:], 0) # init an input of [1, batch_size, hidden_size]
         decoder_hidden = encoder_hidden
         if is_training:
+            output = []
             for i in range(1, target_input.size()[1]):
                 decoder_output, decoder_hidden = self.decoder_step(decoder_input, decoder_hidden)
                 
                 decoder_output = decoder_output.permute(1, 2, 0) #[batch, hidden_size, 1]
                 weight = (torch.bmm(encoder_output, decoder_output)).permute(0, 2, 1) #[batch, time_step, 1] -> [batch, 1, timesteps]
-                context = (torch.bmm(weight, encoder_output)).permute(1, 0, 2) #
-                decoder_output = torch.cat((context, decoder_output.permute(2, 0, 1)), 2)
-                
+                context = (torch.bmm(weight, encoder_output)).permute(1, 0, 2) #[1, batch_size, hidden_size]
+                decoder_output = torch.cat((context, decoder_output.permute(2, 0, 1)), 2) #[1, batch_size, hidden_size * 2]
+                output.append(decoder_output) # list of [1, batch, hidden_size * 2] 
+
                 loss += self.softmax_cross_entropyloss(decoder_output, self.target_seq[:, i-1], self.loss_mask[:, i-1])
                 decoder_input = torch.unsqueeze(target_input[:, i, :], 0) 
-            return loss
+
+            # [time_steps, batch_size, vacab_size] -> [batch_size, time_steps, vacab_size]
+            output = self.linear(torch.cat(output, 0)).permute(1, 0, 2)
+            return loss, self.seq_output(output) * self.loss_mask # [batch_size, time_steps]
         else:
             output = [] # list of [1, batch_size, hidden_size * 2]
             for i in range(1, target_input.size()[1]):
