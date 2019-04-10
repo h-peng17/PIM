@@ -11,6 +11,7 @@ from optparse import OptionParser
 parser = OptionParser()
 parser.add_option('--gpu',dest='gpu',default = 7,help = 'gpu')
 parser.add_option('--ckpt_index',dest='ckpt_index',default = 1, help = 'ckpt index')
+parser.add_option('--ckpt_dir', dest='ckpt_dir',default='ckpt',help='ckpt')
 (options, args) =parser.parse_args()
 
 os.environ["CUDA_VISIBLE_DEVICES"] = options.gpu
@@ -21,7 +22,7 @@ for key in word2id:
     id2word[word2id[key]] = key
 
 config = Config()
-test = Test(config, '../ckpt_1', id2word)
+test = Test(config, options.ckpt_dir, id2word)
 test.init_test(Model(config), options.ckpt_index)
 
 print('请输入:')
