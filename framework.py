@@ -108,7 +108,7 @@ class Train():
         for epoch in range(self.config.max_epoch):
             for i in range(int(len(train_order) / self.config.batch_size)):
                 loss, accuracy = self.train_one_step()
-                sys.stdout.write('epoch:{}, batch:{}, loss:{}, accuracy:{}\r'.format(epoch, i, loss, round(accuracy, 6)))
+                sys.stdout.write('epoch:{}, batch:{}, accuracy:{}, loss:{}\r'.format(epoch, i, round(accuracy, 6), loss))
                 sys.stdout.flush()
 
 
