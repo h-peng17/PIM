@@ -28,7 +28,8 @@ class Data_loader():
         id1 = self.idx + self.config.batch_size
         self.idx = id1 
         if id1 >= self.instance_total:
-            id1 = self.instance_total
+            # id1 = self.instance_total
+            return None
         index = self.order[id0:id1]
         batch = {}
         batch["query_seq"] = self.query_seq[index]
