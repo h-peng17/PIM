@@ -70,7 +70,7 @@ class Train():
     def init_train(self, model):
         self.train_model = model
         device_ids = [0,1,2]
-        # self.train_model.cuda(device_ids[0])
+        self.train_model.cuda(device_ids[0])
         self.train_model = nn.DataParallel(self.train_model, device_ids = device_ids)
         self.train_model.train()
     
