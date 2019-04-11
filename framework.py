@@ -66,6 +66,8 @@ class Train():
         self.config = config
         self.train_data_loader = train_data_loader
         self.ckpt_dir = ckpt_dir
+        self.correct = 0
+        self.all = 0
 
     def init_train(self, model):
         self.train_model = model
@@ -90,7 +92,7 @@ class Train():
         self.train_model.seq2seq.loss_mask = torch.from_numpy(batch["query_mask"]).to(torch.float32).cuda()
 
         target_seq = np.multiply(batch["target_seq"], batch["query_mask"]) #[batch, time_steps]
-        all_leng = np.sum(batch["target_seq_len"]) # total
+        self.all += np.sum(batch["target_seq_len"]) # total
 
         self.optimizer.zero_grad()
         loss, output = self.train_model()
@@ -99,8 +101,8 @@ class Train():
 
         output = np.array(((output.cpu()).detach()))
         output = np.multiply(output, batch["query_mask"])
-        correct = np.logical_and(output == target_seq, output != 0).sum()
-        accuracy = correct / all_leng
+        self.correct += np.logical_and(output == target_seq, output != 0).sum()
+        accuracy = self.correct / self.all
 
         return loss, accuracy 
     
