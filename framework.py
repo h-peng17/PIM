@@ -30,7 +30,7 @@ class Config():
     def __init__(self):
         self.vacab_size = 6763
         self.pin_size = 406
-        self.batch_size = 1024
+        self.batch_size = 128
         self.lr = 0.001 
         self.max_epoch = 1000
         self.embedding_size = 300
