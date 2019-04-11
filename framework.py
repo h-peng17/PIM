@@ -30,7 +30,7 @@ class Config():
     def __init__(self):
         self.vacab_size = 6763
         self.pin_size = 406
-        self.batch_size = 128
+        self.batch_size = 3072
         self.lr = 0.001 
         self.max_epoch = 1000
         self.embedding_size = 300
@@ -69,7 +69,9 @@ class Train():
 
     def init_train(self, model):
         self.train_model = model
-        self.train_model.cuda()
+        device_ids = [0,1,2]
+        self.train_model.cuda(device_ids[0])
+        self.train_model = nn.DataParallel(self.train_model, device_ids = device_ids)
         self.train_model.train()
     
         parameters_to_optimize = filter(lambda x: x.requires_grad, self.train_model.parameters())
@@ -80,6 +82,8 @@ class Train():
     
     def train_one_step(self):
         batch = self.train_data_loader.next_batch()
+        if batch == None:
+            batch = self.train_data_loader.next_batch()
         self.train_model.embedding.query_seq = self.to_var(batch["query_seq"])
         self.train_model.embedding.target_seq = self.to_var(batch["target_seq"])
         self.train_model.seq2seq.target_seq = self.to_var(batch["target_seq"])
@@ -115,9 +119,8 @@ class Train():
             if (epoch + 1) % self.config.save_epoch == 0:
                 print('epoch:{} has saved'.format(epoch))
                 path = os.path.join(self.ckpt_dir, self.config.model_name + '-' + str(epoch))
-                torch.save(self.train_model.state_dict(), path)
+                torch.save(self.train_model.module.state_dict(), path)
             
-        np.save('../data/loss.npy', np.array(Loss))
                 
 class Test():
     def __init__(self, config, ckpt_dir, id2word):
