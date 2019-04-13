@@ -10,10 +10,10 @@ class Data_loader():
             taret_seq: [total, time_steps]
             target_seq_len: [total]
         '''
-        self.query_seq = np.load("../data1/{}_query_seq.npy".format(mode)) 
-        self.query_mask = np.load("../data1/{}_query_mask.npy".format(mode))
-        self.target_seq = np.load("../data1/{}_target_seq.npy".format(mode))
-        self.target_seq_len = np.load("../data1/{}_target_seq_len.npy".format(mode))
+        self.query_seq = np.load("../data/{}_query_seq.npy".format(mode)) 
+        self.query_mask = np.load("../data/{}_query_mask.npy".format(mode))
+        self.target_seq = np.load("../data/{}_target_seq.npy".format(mode))
+        self.target_seq_len = np.load("../data/{}_target_seq_len.npy".format(mode))
 
         self.config = config
         self.idx = 0
