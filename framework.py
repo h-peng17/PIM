@@ -142,7 +142,7 @@ class Test():
         if os.path.exists(path):
             self.test_model.load_state_dict(torch.load(path))
     
-    def to_val(self, x):
+    def to_var(self, x):
         return torch.from_numpy(x).to(torch.int64).cuda()
     
     def target_seq(self, batch_size):
@@ -166,7 +166,7 @@ class Test():
         # print('done!')
 
     def people_test_one_step(self, query_seq, target_seq_len):
-        self.test_model.embedding.query_seq = self.to_val(query_seq)
+        self.test_model.embedding.query_seq = self.to_var(query_seq)
         self.test_model.embedding.target_seq = self.target_seq(1)
 
         output = self.test_model.test() #[1, seq_len]
