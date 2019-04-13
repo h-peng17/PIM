@@ -191,7 +191,7 @@ class Test():
         output = np.array(((output.cpu()).detach()))
         output = np.multiply(output, batch["query_mask"])
         for i in range(len(output)):
-            if output[i] == target_seq[i]:
+            if (output[i] == target_seq[i]).all():
                 self.correct += 1
         
         accuracy = self.correct / self.all
