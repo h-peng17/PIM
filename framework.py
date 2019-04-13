@@ -190,7 +190,7 @@ class Test():
 
         output = np.array(((output.cpu()).detach()))
         output = np.multiply(output, batch["query_mask"])
-        for i in len(range(output)):
+        for i in range(len(output)):
             if output[i] == target_seq[i]:
                 self.correct += 1
         
