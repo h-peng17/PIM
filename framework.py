@@ -125,18 +125,22 @@ class Train():
             
                 
 class Test():
-    def __init__(self, config, ckpt_dir, id2word):
+    def __init__(self, config, ckpt_dir, id2word, test_data_loader = None):
         self.config = config 
         self.ckpt_dir = ckpt_dir
         self.id2word = id2word
+        self.test_data_loader = test_data_loader
+        self.all = 0
+        self.correct = 0
 
-    def init_test(self, model, ckpt_index):
+    def init_test(self, model, ckpt_index = 0):
         print('init test model....')
         self.test_model = model
         self.test_model.cuda()
         self.test_model.eval()
         path = os.path.join(self.ckpt_dir, self.config.model_name + '-' + str(ckpt_index))
-        self.test_model.load_state_dict(torch.load(path))
+        if os.path.exists(path):
+            self.test_model.load_state_dict(torch.load(path))
     
     def to_val(self, x):
         return torch.from_numpy(x).to(torch.int64).cuda()
@@ -161,7 +165,7 @@ class Test():
             f.write(out_file)
         # print('done!')
 
-    def test_one_step(self, query_seq, target_seq_len):
+    def people_test_one_step(self, query_seq, target_seq_len):
         self.test_model.embedding.query_seq = self.to_val(query_seq)
         self.test_model.embedding.target_seq = self.target_seq(1)
 
@@ -170,7 +174,54 @@ class Test():
         output = output.tolist()
         self.convert2word(output, target_seq_len)
     
+    def computer_test_one_step(self):
+        batch = self.test_data_loader.next_batch()
+        if batch == None:
+            batch = self.test_data_loader.next_batch()
+        self.test_model.embedding.query_seq = self.to_var(batch["query_seq"])
+        self.test_model.embedding.target_seq = self.to_var(batch["target_seq"])
+        self.test_model.seq2seq.target_seq = self.to_var(batch["target_seq"])
+        self.test_model.seq2seq.loss_mask = torch.from_numpy(batch["query_mask"]).to(torch.float32).cuda()
 
+        target_seq = np.multiply(batch["target_seq"], batch["query_mask"]) #[batch, time_steps]
+        self.all += len(target_seq)
+
+        output = self.test_model.test() #[batch, time_steps]
+
+        output = np.array(((output.cpu()).detach()))
+        output = np.multiply(output, batch["query_mask"])
+        for i in len(range(output)):
+            if output[i] == target_seq[i]:
+                self.correct += 1
+        
+        accuracy = self.correct / self.all
+
+        return accuracy 
+    
+    def _test(self):
+        print("begin testing...")
+        test_order = self.test_data_loader.order
+        best_acc = 0
+        best_epoch = 0
+        for epoch in range(self.config.max_epoch):
+            self.all = 0
+            self.correct = 0
+            path = os.path.join(self.ckpt_dir, self.config.model_name + '-' + str(epoch))
+            if not os.path.exists(path):
+                continue
+            self.test_model.load_state_dict(torch.load(path)) 
+            for i in range(int(len(test_order) / self.config.batch_size)):
+                accuracy = self.computer_test_one_step()
+                sys.stdout.write('epoch:{}, batch:{}, accuracy:{}\r'.format(epoch, i, round(accuracy, 6)))
+                sys.stdout.flush()
+
+            if accuracy > best_acc:
+                best_acc = accuracy
+                best_epoch = epoch
+        print(best_acc)
+        print(best_epoch)
+                
+                            
 
 
 
